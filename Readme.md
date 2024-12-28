@@ -26,6 +26,6 @@ A simple game where you try to guess a random number between 1 and 100. You have
 
    ```bash
    git clone https://github.com/your-username/guess-the-number.git
-   cd guess-the-number
-   
+   cd Game
+
 2. Open index.html in your browser to start playing.
