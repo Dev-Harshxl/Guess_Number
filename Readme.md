@@ -1,6 +1,6 @@
 # Guess the Number Game
-
 A simple game where you try to guess a random number between 1 and 100. You have 10 chances to guess the correct number, and after each guess, you’ll receive a hint whether the number is higher or lower.
+![Screenshot 2024-12-28 200113](https://github.com/user-attachments/assets/1fdd9388-a5bb-4f72-be6c-9965f6a6efb6)
 
 ## How to Play
 
