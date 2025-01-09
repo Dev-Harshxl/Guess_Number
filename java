@@ -356,3 +356,10 @@ public class ExpressionEvaluator {
         scanner.close();
     }
 }
+
+
+
+
+
+
+.*[+*/]{2,}.*|.*[+*/]-[+*/].*|.*[+*/]-{2,}.*
