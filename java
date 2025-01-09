@@ -9,3 +9,18 @@ public static String transformExpression(String expression) {
 
     return expression;
 }
+
+
+
+
+
+
+public static String transformExpression(String expression) {
+    // Replace multiple consecutive '-' with a single '+', but only outside parentheses
+    expression = expression.replaceAll("(?<!\\d)-{2}(?=\\d)", "+");
+
+    // Handle unary minus before numbers or parentheses
+    expression = expression.replaceAll("(?<![0-9.)])-(\\d+(\\.\\d+)?|\\()", "(0-$1)");
+
+    return expression;
+}
