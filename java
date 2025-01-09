@@ -223,3 +223,145 @@ public class ExpressionEvaluator {
         }
     }
 }
+
+
+
+
+
+
+
+
+import java.util.Stack;
+import java.util.regex.Pattern;
+
+public class ExpressionEvaluator {
+
+    public static boolean isValidExpression(String expression) {
+        String consecutiveOperators = ".*[+*/]{2,}.*|.*[-]{3,}.*|.*[-+*/]-[+*/].*";
+        String startOperator = "^[+*/].*";
+        String endOperator = ".*[+\\-*/]$";
+        String validCharacters = "[0-9+\\-*/().]*";
+
+        if (!Pattern.matches(validCharacters, expression)) return false;
+        if (Pattern.matches(consecutiveOperators, expression)) return false;
+        if (Pattern.matches(startOperator, expression)) return false;
+        if (Pattern.matches(endOperator, expression)) return false;
+        if (!areParenthesesBalanced(expression)) return false;
+
+        return true;
+    }
+
+    public static boolean areParenthesesBalanced(String expression) {
+        Stack<Character> stack = new Stack<>();
+        for (char ch : expression.toCharArray()) {
+            if (ch == '(') stack.push(ch);
+            else if (ch == ')') {
+                if (stack.isEmpty()) return false;
+                stack.pop();
+            }
+        }
+        return stack.isEmpty();
+    }
+
+    public static double evaluateExpression(String expression) {
+        expression = transformExpression(expression);
+        String postfix = infixToPostfix(expression);
+        return evaluatePostfix(postfix);
+    }
+
+    public static String transformExpression(String expression) {
+        return expression.replaceAll("(?<![0-9.)])-(\\d+(\\.\\d+)?|\\()", "(0-$1)");
+    }
+
+    public static String infixToPostfix(String expression) {
+        Stack<Character> operators = new Stack<>();
+        StringBuilder postfix = new StringBuilder();
+        int i = 0;
+
+        while (i < expression.length()) {
+            char c = expression.charAt(i);
+            if (Character.isWhitespace(c)) {
+                i++;
+                continue;
+            }
+            if (Character.isDigit(c) || c == '.') {
+                StringBuilder num = new StringBuilder();
+                while (i < expression.length() && 
+                      (Character.isDigit(expression.charAt(i)) || expression.charAt(i) == '.')) {
+                    num.append(expression.charAt(i));
+                    i++;
+                }
+                postfix.append(num).append(' ');
+                continue;
+            }
+            if (c == '(') operators.push(c);
+            else if (c == ')') {
+                while (!operators.isEmpty() && operators.peek() != '(') {
+                    postfix.append(operators.pop()).append(' ');
+                }
+                operators.pop();
+            } else if (isOperator(c)) {
+                while (!operators.isEmpty() && precedence(operators.peek()) >= precedence(c)) {
+                    postfix.append(operators.pop()).append(' ');
+                }
+                operators.push(c);
+            }
+            i++;
+        }
+
+        while (!operators.isEmpty()) {
+            postfix.append(operators.pop()).append(' ');
+        }
+
+        return postfix.toString().trim();
+    }
+
+    public static double evaluatePostfix(String postfix) {
+        Stack<Double> stack = new Stack<>();
+        String[] tokens = postfix.split("\\s+");
+
+        for (String token : tokens) {
+            if (isNumber(token)) {
+                stack.push(Double.parseDouble(token));
+            } else {
+                double b = stack.pop();
+                double a = stack.pop();
+                switch (token.charAt(0)) {
+                    case '+': stack.push(a + b); break;
+                    case '-': stack.push(a - b); break;
+                    case '*': stack.push(a * b); break;
+                    case '/': stack.push(a / b); break;
+                }
+            }
+        }
+
+        return stack.pop();
+    }
+
+    public static boolean isNumber(String token) {
+        return token.matches("-?\\d+(\\.\\d+)?");
+    }
+
+    public static boolean isOperator(char c) {
+        return c == '+' || c == '-' || c == '*' || c == '/';
+    }
+
+    public static int precedence(char op) {
+        if (op == '+' || op == '-') return 1;
+        if (op == '*' || op == '/') return 2;
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        String expression = "-5 + 3 * (2 - 4)";
+        
+        if (isValidExpression(expression)) {
+            double result = evaluateExpression(expression);
+            System.out.println("Result: " + result);
+        } else {
+            System.out.println("Invalid expression! Please enter a valid infix expression.");
+        }
+    }
+}
+
+
