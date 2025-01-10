@@ -32,3 +32,22 @@ public static String transformExpression(String expression) {
 
     return expression;
 }
+
+
+
+public static String transformExpression(String expression) {
+    // Add '*' between a number or closing parenthesis and an opening parenthesis
+    expression = expression.replaceAll("(?<=[0-9)])\\((?=[0-9(])", "*(");
+
+    // Replace '--' with '+' when it appears between two numbers or parentheses
+    expression = expression.replaceAll("(?<=[0-9)])-{2}(?=[0-9(])", "+");
+
+    // Handle unary minus before numbers or parentheses
+    expression = expression.replaceAll("(?<![0-9.)])-(\\d+(\\.\\d+)?|\\()", "(0-$1)");
+
+    // Replace '-+' or '+-' with a single '-'
+    expression = expression.replaceAll("[-+]{2}", "-");
+
+    return expression;
+}
+
