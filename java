@@ -12,6 +12,7 @@ public static String transformExpression(String expression) {
 }
 
 
+expression = expression.replaceAll("((?<=[0-9)])|\\G)\\(", "*(");
 
 
 
