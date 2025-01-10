@@ -15,6 +15,9 @@ public static String transformExpression(String expression) {
 expression = expression.replaceAll("((?<=[0-9)])|\\G)\\(", "*(");
 
 
+// Add '*' between a number, closing parenthesis, or start of string and an opening parenthesis,
+// only if the opening parenthesis is followed by a digit or another opening parenthesis
+expression = expression.replaceAll("((?<=[0-9)])|\\G)\\((?=[0-9(])", "*(");
 
 
 public static String transformExpression(String expression) {
