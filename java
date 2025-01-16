@@ -37,6 +37,7 @@ public class JDBCProgram {
         System.out.println("4. Show non-deleted items");
         System.out.println("5. Exit");
         System.out.println("6. Show deleted items");
+        System.out.println("7. Update an item");
 
         try {
             String input = scanner.nextLine();
@@ -67,11 +68,18 @@ public class JDBCProgram {
                 case 6:
                     showDeletedItems(conn);
                     break;
+                case 7:
+                    System.out.print("Enter name of item to update: ");
+                    String nameToUpdate = scanner.nextLine();
+                    System.out.print("Enter new name: ");
+                    String newName = scanner.nextLine();
+                    updateItem(conn, nameToUpdate, newName);
+                    break;
                 default:
                     System.out.println("Invalid choice. Try again.");
             }
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a number between 1 and 6.");
+            System.out.println("Invalid input. Please enter a number between 1 and 7.");
         }
 
         // Call the function recursively for the next iteration
@@ -135,6 +143,46 @@ public class JDBCProgram {
                 System.out.println("Item recovered successfully.");
             } else {
                 System.out.println("Error: No deleted item found with this name.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void updateItem(Connection conn, String name, String newName) {
+        // Check if the item is in the deleted list
+        String checkSQL = "SELECT is_deleted FROM items WHERE name = ?";
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSQL)) {
+            checkStmt.setString(1, name);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next()) {
+                boolean isDeleted = rs.getBoolean("is_deleted");
+                if (isDeleted) {
+                    System.out.println("Item not found. It is in the deleted list.");
+                } else {
+                    // Check if the new name already exists in the non-deleted list
+                    String checkNewNameSQL = "SELECT COUNT(*) FROM items WHERE name = ? AND is_deleted = FALSE";
+                    try (PreparedStatement checkNewStmt = conn.prepareStatement(checkNewNameSQL)) {
+                        checkNewStmt.setString(1, newName);
+                        ResultSet newNameResult = checkNewStmt.executeQuery();
+                        newNameResult.next();
+                        if (newNameResult.getInt(1) > 0) {
+                            System.out.println("Error: Duplicate name. This name already exists.");
+                        } else {
+                            // Proceed with updating the item
+                            String updateSQL = "UPDATE items SET name = ? WHERE name = ?";
+                            try (PreparedStatement pstmt = conn.prepareStatement(updateSQL)) {
+                                pstmt.setString(1, newName);
+                                pstmt.setString(2, name);
+                                pstmt.executeUpdate();
+                                System.out.println("Item updated successfully.");
+                            }
+                        }
+                    }
+                }
+            } else {
+                System.out.println("Item not found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
