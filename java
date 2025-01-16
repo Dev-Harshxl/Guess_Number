@@ -1,53 +1,23 @@
-
-
-
-public static String transformExpression(String expression) {
-    // Replace '--' with '+' when it appears between two numbers or parentheses
-    expression = expression.replaceAll("(?<=[0-9)])-{2}(?=[0-9(])", "+");
-
-    // Handle unary minus before numbers or parentheses
-    expression = expression.replaceAll("(?<![0-9.)])-(\\d+(\\.\\d+)?|\\()", "(0-$1)");
-
-    return expression;
+public static void main(String[] args) {
+    try {
+        Class.forName("com.mysql.jdbc.Driver");  // Corrected syntax
+        String url = "jdbc:mysql://localhost:3306/cart";
+        String username = "root";
+        String password = "Asdas@12";
+        
+        Connection connection = DriverManager.getConnection(url, username, password);
+        System.out.println("Connected");
+        
+        Scanner val = new Scanner(System.in);
+        String table = val.nextLine();  // Input table name
+        
+        String sql = "CREATE TABLE " + table + " (Id INT NOT NULL, Item VARCHAR(255), PRIMARY KEY(Item))";
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.executeUpdate();  // Use executeUpdate for DDL statements
+        
+        System.out.println("Table created successfully");
+    } catch (Exception e) {
+        System.out.println("nope");
+        e.printStackTrace();
+    }
 }
-
-
-expression = expression.replaceAll("((?<=[0-9)])|\\G)\\(", "*(");
-
-
-// Add '*' between a number, closing parenthesis, or start of string and an opening parenthesis,
-// only if the opening parenthesis is followed by a digit or another opening parenthesis
-expression = expression.replaceAll("((?<=[0-9)])|\\G)\\((?=[0-9(])", "*(");
-
-
-public static String transformExpression(String expression) {
-    // Add '*' between a number and an opening parenthesis if not already present
-    expression = expression.replaceAll("(?<=[0-9)])\\(", "*(");
-
-    // Replace '--' with '+' when it appears between two numbers or parentheses
-    expression = expression.replaceAll("(?<=[0-9)])-{2}(?=[0-9(])", "+");
-
-    // Handle unary minus before numbers or parentheses
-    expression = expression.replaceAll("(?<![0-9.)])-(\\d+(\\.\\d+)?|\\()", "(0-$1)");
-
-    return expression;
-}
-
-
-
-public static String transformExpression(String expression) {
-    // Add '*' between a number or closing parenthesis and an opening parenthesis
-    expression = expression.replaceAll("(?<=[0-9)])\\((?=[0-9(])", "*(");
-
-    // Replace '--' with '+' when it appears between two numbers or parentheses
-    expression = expression.replaceAll("(?<=[0-9)])-{2}(?=[0-9(])", "+");
-
-    // Handle unary minus before numbers or parentheses
-    expression = expression.replaceAll("(?<![0-9.)])-(\\d+(\\.\\d+)?|\\()", "(0-$1)");
-
-    // Replace '-+' or '+-' with a single '-'
-    expression = expression.replaceAll("[-+]{2}", "-");
-
-    return expression;
-}
-
