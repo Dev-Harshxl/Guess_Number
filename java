@@ -21,12 +21,13 @@ public class JDBCProgram {
             }
 
             while (true) {
-                System.out.println("Choose an option:");
+                System.out.println("\nChoose an option:");
                 System.out.println("1. Add data to table");
                 System.out.println("2. Delete data from table");
                 System.out.println("3. Recover deleted data");
-                System.out.println("4. Show data");
+                System.out.println("4. Show non-deleted items");
                 System.out.println("5. Exit");
+                System.out.println("6. Show deleted items");
                 int choice = scanner.nextInt();
                 scanner.nextLine(); // Consume newline
 
@@ -47,11 +48,14 @@ public class JDBCProgram {
                         recoverItem(conn, nameToRecover);
                         break;
                     case 4:
-                        showData(conn);
+                        showNonDeletedItems(conn);
                         break;
                     case 5:
                         System.out.println("Exiting program.");
                         return;
+                    case 6:
+                        showDeletedItems(conn);
+                        break;
                     default:
                         System.out.println("Invalid choice. Try again.");
                 }
@@ -104,16 +108,40 @@ public class JDBCProgram {
         }
     }
 
-    private static void showData(Connection conn) {
-        String selectSQL = "SELECT name, is_deleted FROM items";
+    private static void showNonDeletedItems(Connection conn) {
+        String selectSQL = "SELECT name FROM items WHERE is_deleted = FALSE";
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(selectSQL)) {
 
-            System.out.println("Items in table:");
+            System.out.println("\nNon-Deleted Items:");
+            boolean hasItems = false;
             while (rs.next()) {
                 String name = rs.getString("name");
-                boolean isDeleted = rs.getBoolean("is_deleted");
-                System.out.println(name + " (Deleted: " + isDeleted + ")");
+                System.out.println("- " + name);
+                hasItems = true;
+            }
+            if (!hasItems) {
+                System.out.println("No non-deleted items found.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void showDeletedItems(Connection conn) {
+        String selectSQL = "SELECT name FROM items WHERE is_deleted = TRUE";
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(selectSQL)) {
+
+            System.out.println("\nDeleted Items:");
+            boolean hasItems = false;
+            while (rs.next()) {
+                String name = rs.getString("name");
+                System.out.println("- " + name);
+                hasItems = true;
+            }
+            if (!hasItems) {
+                System.out.println("No deleted items found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
