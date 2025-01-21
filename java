@@ -35,3 +35,7 @@ app.get('/api/data', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+
+
+ALTER USER 'your_username'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password';
+FLUSH PRIVILEGES;
