@@ -134,3 +134,31 @@ const ModalComponent = ({ show, handleClose }) => {
 
 export default ModalComponent;
 
+
+
+
+// ParentComponent.js
+import React, { useState } from 'react';
+import ModalComponent from './ModalComponent'; // Import the modal component
+import ButtonComponent from './ButtonComponent'; // Import the button component
+
+const ParentComponent = () => {
+  const [show, setShow] = useState(false);
+
+  const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
+
+  return (
+    <div>
+      <h1>Parent Component</h1>
+      {/* Pass handleShow to ButtonComponent */}
+      <ButtonComponent handleShow={handleShow} />
+      {/* Pass show and handleClose to ModalComponent */}
+      <ModalComponent show={show} handleClose={handleClose} />
+    </div>
+  );
+};
+
+export default ParentComponent;
+
+
