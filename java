@@ -227,3 +227,42 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
 
 
+package com.example.demo.controller;
+
+import com.example.demo.entity.Item;
+import com.example.demo.repository.ItemRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/items")
+public class ItemController {
+
+    @Autowired
+    private ItemRepository itemRepository;
+
+    // Fetch all items
+    @GetMapping
+    public List<Item> getAllItems() {
+        return itemRepository.findAll();
+    }
+
+    // Create a new item
+    @PostMapping
+    public Item createItem(@RequestBody Item item) {
+        return itemRepository.save(item);
+    }
+
+    // Delete an item by ID
+    @DeleteMapping("/{id}")
+    public void deleteItem(@PathVariable Long id) {
+        itemRepository.deleteById(id);
+    }
+}
+
+
+
+
+
