@@ -98,3 +98,39 @@ INSERT INTO data (id, title, descr, image) VALUES
 (8, 'Title 8', 'This description marks the eighth entry. It continues the trend of providing a new paragraph that is long enough to fit the requirement. We are trying to use different kinds of content to populate the table and illustrate diversity in descriptions.', 'https://example.com/image8.jpg'),
 (9, 'Title 9', 'As we reach the ninth entry, the same pattern is followed. The paragraph has more than 50 words, and the content differs from the others in terms of its message and meaning. Each entry is unique, and the image URLs are also distinct.', 'https://example.com/image9.jpg'),
 (10, 'Title 10', 'Finally, the tenth entry rounds off the examples. The description, as with all the previous entries, follows the word count requirement and brings its own specific content. The goal is to demonstrate the ability to populate a database with various data types and formats.', 'https://example.com/image10.jpg');
+
+
+
+
+// ModalComponent.js
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+
+const ModalComponent = ({ show, handleClose }) => {
+  return (
+    <Modal
+      show={show}
+      onHide={handleClose}
+      backdrop="static"
+      keyboard={false}
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>Modal title</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        I will not close if you click outside me. Do not even try to press
+        escape key.
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Close
+        </Button>
+        <Button variant="primary">Understood</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
+export default ModalComponent;
+
