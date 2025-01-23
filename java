@@ -553,3 +553,37 @@ const App = () => {
 export default App;
 
 
+
+
+hhhhhhhhhhhhh
+// src/components/Modal.js
+import React from 'react';
+
+const Modal = ({ isOpen, onConfirm, onCancel }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div style={modalStyle}>
+      <p>Are you sure you want to delete this item?</p>
+      <button onClick={onConfirm}>Yes</button>
+      <button onClick={onCancel}>Cancel</button>
+    </div>
+  );
+};
+
+// Modal Styling
+const modalStyle = {
+  position: 'fixed',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  backgroundColor: 'white',
+  padding: '20px',
+  border: '1px solid #ccc',
+  borderRadius: '5px',
+  zIndex: 1000,
+};
+
+export default Modal;
+
+
