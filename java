@@ -587,3 +587,71 @@ const modalStyle = {
 export default Modal;
 
 
+
+
+
+
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { createItem, updateItem } from './services/api';
+
+const FormPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ title: '', description: '' });
+
+  useEffect(() => {
+    if (location.state) {
+      // If state exists, pre-fill form with item data (edit mode)
+      setFormData(location.state);
+    }
+  }, [location.state]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (location.state) {
+      // Edit mode: update existing item
+      await updateItem(location.state.id, formData);
+    } else {
+      // Create mode: add new item
+      await createItem(formData);
+    }
+    navigate('/'); // Redirect to main page
+  };
+
+  return (
+    <div>
+      <h1>{location.state ? 'Edit Item' : 'Create Item'}</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Title:</label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label>Description:</label>
+          <input
+            type="text"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+          />
+        </div>
+        <button type="submit">{location.state ? 'Update' : 'Create'}</button>
+      </form>
+    </div>
+  );
+};
+
+export default FormPage;
+
+
