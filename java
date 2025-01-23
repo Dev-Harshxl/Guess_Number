@@ -468,5 +468,88 @@ const modalStyle = {
 };
 
 export default App;
+_---------3++++-----+++--+
+// src/App.js
+import React, { useEffect, useState } from 'react';
+import { getItems, createItem, deleteItem } from './services/api';
+import Modal from './components/Modal';
+
+const App = () => {
+  const [items, setItems] = useState([]);
+  const [newItem, setNewItem] = useState({ title: '', description: '' });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  const fetchItems = async () => {
+    const response = await getItems();
+    setItems(response.data);
+  };
+
+  const handleCreate = async () => {
+    await createItem(newItem);
+    setNewItem({ title: '', description: '' });
+    fetchItems();
+  };
+
+  const openDeleteModal = (id) => {
+    setDeleteId(id);
+    setIsModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsModalOpen(false);
+    setDeleteId(null);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteId) {
+      await deleteItem(deleteId);
+      fetchItems();
+      closeDeleteModal();
+    }
+  };
+
+  return (
+    <div>
+      <h1>Items</h1>
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}>
+            {item.title} - {item.description}{' '}
+            <button onClick={() => openDeleteModal(item.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+      <div>
+        <input
+          type="text"
+          placeholder="Title"
+          value={newItem.title}
+          onChange={(e) => setNewItem({ ...newItem, title: e.target.value })}
+        />
+        <input
+          type="text"
+          placeholder="Description"
+          value={newItem.description}
+          onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+        />
+        <button onClick={handleCreate}>Add Item</button>
+      </div>
+
+      {/* Modal Component */}
+      <Modal
+        isOpen={isModalOpen}
+        onConfirm={confirmDelete}
+        onCancel={closeDeleteModal}
+      />
+    </div>
+  );
+};
+
+export default App;
 
 
