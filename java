@@ -1,49 +1,3 @@
-@PutMapping("/{id}")
-public ResponseEntity<?> updateItem(
-        @PathVariable Long id,
-        @RequestParam("title") String title,
-        @RequestParam("description") String description,
-        @RequestParam(value = "image", required = false) MultipartFile image) {
-    try {
-        if (!itemRepository.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Item with ID " + id + " not found.");
-        }
-
-        // Fetch existing item
-        items existingItem = itemRepository.findById(id).orElse(null);
-
-        if (existingItem != null) {
-            // Update fields
-            existingItem.setTitle(title);
-            existingItem.setDescription(description);
-
-            // Update image only if a new image is provided
-            if (image != null && !image.isEmpty()) {
-                byte[] imageBytes = processImage(image);
-                existingItem.setImage(imageBytes);
-            }
-
-            // Save updated item
-            itemRepository.save(existingItem);
-            return ResponseEntity.ok(existingItem);
-        }
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Item with ID " + id + " not found.");
-    } catch (IOException e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error processing image: " + e.getMessage());
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + e.getMessage());
-    }
-}
-
-
-
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Form, Button } from "react-bootstrap";
@@ -52,7 +6,7 @@ import { getItems, createItem, updateItem } from "../api"; // Your API functions
 const Feed = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(null); // For uploaded file
   const [imagePreview, setImagePreview] = useState(null); // For image preview
   const { id } = useParams(); // Get ID from URL parameter if available
   const navigate = useNavigate(); // Used to navigate programmatically
@@ -70,7 +24,10 @@ const Feed = () => {
 
             // Convert binary image data to Base64 for preview
             if (itemToEdit.image) {
-              const base64String = toBase64(itemToEdit.image.data, "image/jpeg"); // Assuming image is JPEG
+              const base64String = toBase64(
+                itemToEdit.image.data, // Assuming `image.data` contains binary data
+                itemToEdit.image.type || "image/jpeg" // Default MIME type
+              );
               setImagePreview(base64String);
             }
           }
@@ -153,7 +110,7 @@ const Feed = () => {
 
         <Form.Group controlId="image">
           <Form.Label>Upload Image</Form.Label>
-          <Form.Control type="file" onChange={handleImageChange} />
+          <Form.Control type="file" onChange={handleImageChange} accept="image/*" />
           {/* Image Preview */}
           {imagePreview && (
             <div style={{ marginTop: "10px" }}>
