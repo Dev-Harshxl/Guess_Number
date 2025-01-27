@@ -6,7 +6,7 @@ import { getItems, createItem, updateItem } from "../api"; // Your API functions
 const Feed = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState(null); // For uploaded file
+  const [image, setImage] = useState(null); // For new uploaded file
   const [imagePreview, setImagePreview] = useState(null); // For image preview
   const { id } = useParams(); // Get ID from URL parameter if available
   const navigate = useNavigate(); // Used to navigate programmatically
@@ -26,7 +26,7 @@ const Feed = () => {
             if (itemToEdit.image) {
               const base64String = toBase64(
                 itemToEdit.image.data, // Assuming `image.data` contains binary data
-                itemToEdit.image.type || "image/jpeg" // Default MIME type
+                "image/jpeg" // Default MIME type; adjust if necessary
               );
               setImagePreview(base64String);
             }
@@ -41,16 +41,20 @@ const Feed = () => {
   }, [id]);
 
   const toBase64 = (binaryData, mimeType = "image/jpeg") => {
-    return `data:${mimeType};base64,${btoa(
-      String.fromCharCode(...new Uint8Array(binaryData))
-    )}`;
+    // Convert binary data to Base64 URL
+    if (binaryData) {
+      return `data:${mimeType};base64,${btoa(
+        String.fromCharCode(...new Uint8Array(binaryData))
+      )}`;
+    }
+    return null;
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
 
-    // Show image preview
+    // Show image preview for the new file
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
@@ -110,7 +114,11 @@ const Feed = () => {
 
         <Form.Group controlId="image">
           <Form.Label>Upload Image</Form.Label>
-          <Form.Control type="file" onChange={handleImageChange} accept="image/*" />
+          <Form.Control
+            type="file"
+            onChange={handleImageChange}
+            accept="image/jpeg, image/png, image/jpg"
+          />
           {/* Image Preview */}
           {imagePreview && (
             <div style={{ marginTop: "10px" }}>
