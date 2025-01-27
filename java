@@ -7,9 +7,9 @@ const Feed = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null); // For new uploaded file
-  const [imagePreview, setImagePreview] = useState(null); // For image preview
-  const { id } = useParams(); // Get ID from URL parameter if available
-  const navigate = useNavigate(); // Used to navigate programmatically
+  const [imagePreview, setImagePreview] = useState(null); // For preview (Base64 URL)
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
@@ -22,11 +22,11 @@ const Feed = () => {
             setTitle(itemToEdit.title);
             setDescription(itemToEdit.description);
 
-            // Convert binary image data to Base64 for preview
-            if (itemToEdit.image) {
+            // Generate Base64 preview if the image exists
+            if (itemToEdit.image && itemToEdit.image.data) {
               const base64String = toBase64(
-                itemToEdit.image.data, // Assuming `image.data` contains binary data
-                "image/jpeg" // Default MIME type; adjust if necessary
+                itemToEdit.image.data, // Assuming backend sends binary data in `image.data`
+                "image/jpeg" // Default MIME type; adjust based on your backend
               );
               setImagePreview(base64String);
             }
@@ -41,7 +41,6 @@ const Feed = () => {
   }, [id]);
 
   const toBase64 = (binaryData, mimeType = "image/jpeg") => {
-    // Convert binary data to Base64 URL
     if (binaryData) {
       return `data:${mimeType};base64,${btoa(
         String.fromCharCode(...new Uint8Array(binaryData))
@@ -54,7 +53,7 @@ const Feed = () => {
     const file = e.target.files[0];
     setImage(file);
 
-    // Show image preview for the new file
+    // Update preview dynamically for the new file
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
@@ -142,4 +141,3 @@ const Feed = () => {
 };
 
 export default Feed;
-
