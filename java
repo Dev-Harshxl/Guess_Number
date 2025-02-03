@@ -22,3 +22,32 @@ public List<Map<String, Object>> getAllItems() {
 
     return response;
 }
+
+
+
+import { takeEvery, put, call } from "redux-saga/effects";
+import { setTodos } from "./todoActions";
+
+// Worker saga that handles the API call
+function* fetchTodosSaga() {
+  try {
+    // Dispatch to indicate loading has started
+    yield put({ type: "FETCH_TODOS_REQUEST" });
+
+    const response = yield call(fetch, "https://jsonplaceholder.typicode.com/todos?_limit=5");
+    const todos = yield response.json();
+    const todoTitles = todos.map((todo) => todo.title);
+
+    // Dispatch to set todos and stop the loading state
+    yield put(setTodos(todoTitles));
+  } catch (error) {
+    console.error("Error fetching todos:", error);
+  }
+}
+
+// Watcher saga listens for FETCH_TODOS_REQUEST action
+function* rootSaga() {
+  yield takeEvery("FETCH_TODOS_REQUEST", fetchTodosSaga);
+}
+
+export default rootSaga;
