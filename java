@@ -1,37 +1,35 @@
-import { createTheme } from '@mui/material/styles';
+@PutMapping("/{id}")
+public ResponseEntity<?> updateCartItem(
+        @PathVariable Long id,
+        @RequestParam("quantity") int quantity) {
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2', // Change this to your preferred primary color
-    },
-    secondary: {
-      main: '#ff4081',
-    },
-    background: {
-      default: '#f5f5f5',
-      paper: '#ffffff',
-    },
-  },
-  typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
-    h1: {
-      fontSize: '2.5rem',
-      fontWeight: 700,
-    },
-    body1: {
-      fontSize: '1rem',
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: '8px', // Rounded buttons
-        },
-      },
-    },
-  },
-});
+    Optional<PhoneCart> cartItemOptional = cartRepository.findById(id);
 
-export default theme;
+    if (cartItemOptional.isPresent()) {
+        PhoneCart cartItem = cartItemOptional.get();
+        Phone phone = cartItem.getPhone();
+
+        int previousQuantity = cartItem.getQuantity();
+        int quantityDifference = quantity - previousQuantity;
+
+        // Ensure stock is available before increasing quantity
+        if (quantityDifference > 0 && phone.getQuantity() < quantityDifference) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Not enough stock available.");
+        }
+
+        // Update cart item quantity
+        cartItem.setQuantity(quantity);
+        cartItem.setTotalPrice(quantity * phone.getPrice());
+        cartRepository.save(cartItem);
+
+        // Adjust stock correctly
+        phone.setQuantity(phone.getQuantity() - quantityDifference);
+        phoneRepository.save(phone);
+
+        return ResponseEntity.ok(cartItem);
+    }
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body("Cart item with ID " + id + " not found.");
+}
